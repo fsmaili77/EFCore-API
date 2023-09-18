@@ -9,7 +9,7 @@ namespace efCoreApi.Data
         {
             context.Database.EnsureCreated();
 
-            if (!context.Produits.Any())
+            if (context.Produits != null && !context.Produits.Any())
             {
                 var json = File.ReadAllText("Data/produits.json");
                 var data = JsonConvert.DeserializeObject<List<Produit>>(json);
