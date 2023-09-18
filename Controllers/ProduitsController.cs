@@ -1,5 +1,4 @@
 ﻿using efCoreApi.Entities;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace efCoreApi.Controllers
@@ -19,6 +18,10 @@ namespace efCoreApi.Controllers
         [HttpGet]
         public ActionResult<IEnumerable<Produit>> Get()
         {
+            if (_context.Produits == null)
+            {
+                return NotFound(); // Or return an appropriate error response
+            }
             var produits = _context.Produits.ToList();
             return Ok(produits);
         }
@@ -27,7 +30,7 @@ namespace efCoreApi.Controllers
         [HttpGet("{id}")]
         public ActionResult<Produit> GetById(int id)
         {
-            var produit = _context.Produits.FirstOrDefault(p => p.Id == id);
+            var produit = _context.Produits?.FirstOrDefault(p => p.Id == id);            
 
             if (produit == null)
             {
@@ -41,17 +44,19 @@ namespace efCoreApi.Controllers
         [HttpPost]
         public ActionResult<Produit> Create(Produit produit)
         {
-            if (produit == null)
+            if (_context.Produits != null)
             {
-                return BadRequest();
+                // Add the new product to the database
+                _context.Produits.Add(produit);
+                _context.SaveChanges();
+
+                // Return the newly created product
+                return CreatedAtAction(nameof(GetById), new { id = produit.Id }, produit);
             }
-
-            // Add the new product to the database
-            _context.Produits.Add(produit);
-            _context.SaveChanges();
-
-            // Return the newly created product
-            return CreatedAtAction(nameof(GetById), new { id = produit.Id }, produit);
+            else
+            {
+                return NotFound(); // Or return an appropriate error response
+            }
         }
 
         // Update an existing product by ID
@@ -63,7 +68,7 @@ namespace efCoreApi.Controllers
                 return BadRequest();
             }
 
-            var existingProduit = _context.Produits.FirstOrDefault(p => p.Id == id);
+            var existingProduit = _context.Produits?.FirstOrDefault(p => p.Id == id);
 
             if (existingProduit == null)
             {
@@ -83,7 +88,7 @@ namespace efCoreApi.Controllers
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {
-            var produit = _context.Produits.FirstOrDefault(p => p.Id == id);
+            var produit = _context.Produits?.FirstOrDefault(p => p.Id == id);
 
             if (produit == null)
             {
@@ -91,7 +96,7 @@ namespace efCoreApi.Controllers
             }
 
             // Remove the product from the database
-            _context.Produits.Remove(produit);
+            _context.Produits?.Remove(produit);
             _context.SaveChanges();
 
             return NoContent();

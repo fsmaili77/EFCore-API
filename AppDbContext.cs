@@ -5,11 +5,10 @@ namespace efCoreApi
 {
     public class AppDbContext : DbContext
     {
-        public AppDbContext(DbContextOptions options) : base(options)
+        public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
         {
         }
-
-        public DbSet<Produit> Produits { get; set; }
+        public DbSet<Produit>? Produits { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

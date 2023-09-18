@@ -14,8 +14,15 @@ namespace efCoreApi.Data
                 var json = File.ReadAllText("Data/produits.json");
                 var data = JsonConvert.DeserializeObject<List<Produit>>(json);
 
-                context.Produits.AddRange(data);
-                context.SaveChanges();
+                if (data != null)
+                {
+                    context.Produits.AddRange(data);
+                    context.SaveChanges();
+                }
+                else
+                {
+                    // Handle the case where data is null, e.g., log an error or take appropriate action.
+                }
             }
         }
     }
